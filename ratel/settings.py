@@ -44,9 +44,6 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'accounts',
     'details',
-    'matching',
-    'meeting',
-
 ]
 
 MIDDLEWARE = [
@@ -139,12 +136,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 
-DJOSER = {
-    'SERIALIZERS': {
-        'user_create': 'accounts.serializers.UserCreateSerializer',
-        'current_user': 'accounts.serializers.UserSerializer',
-    }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
+
 
 SIMPLE_JWT ={
     'AUTH_HEADER_TYPES': ('JWT',),

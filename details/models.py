@@ -1,26 +1,47 @@
 from django.db import models
-from django.contrib import admin
+
+class Subjects(models.Model):
+    name = models.CharField(max_length=100)
+    year = models.IntegerField()
+    ttset = models.CharField(max_length=10) 
+    sem = models.SmallIntegerField()
+
+    def __str__(self):
+        return f"{self.name} ({self.ttset})"
+
+from django.db import models
+# from django.contrib.auth.models import User
 from django.conf import settings
 
 class Student(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    ttset=models.SmallIntegerField(default=0)
-    phone=models.CharField(max_length=13, blank=True, null=True)
-
+    # Link to the User account
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='student_profile')
     
+    # We use reg_no as the primary key as you requested
+    reg_no = models.CharField(max_length=20, unique=True, primary_key=True)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    
+    # Academic Data
+    year = models.IntegerField()
+    ttset = models.CharField(max_length=10)
+    sem = models.SmallIntegerField()
+    
+    # Matching Logic
+    is_available = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name}"
+        return f"{self.reg_no} ({self.user.username})"
+
+class StudyMeeting(models.Model):
+    topic = models.CharField(max_length=200)
+    subject = models.ForeignKey(Subjects, on_delete=models.CASCADE)
+    creator = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='created_meetings')
+    meeting_time = models.DateTimeField()
+    location = models.CharField(max_length=255, default="Library / Online")
     
-    @admin.display(ordering='user__first_name')
-    def first_name(self):
-        return self.user.first_name
-    
-    @admin.display(ordering='user__last_name')
-    def last_name(self):
-        return self.user.last_name
-    
-    class Meta:
-        ordering = ['user__first_name', 'user__last_name']
+    # Many students can join one meeting
+    participants = models.ManyToManyField(Student, related_name='joined_meetings', blank=True)
+
+    def __str__(self):
+        return f"{self.topic} - {self.subject.name}"

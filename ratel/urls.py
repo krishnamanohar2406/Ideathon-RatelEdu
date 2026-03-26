@@ -15,18 +15,31 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.conf import settings
-from django.conf.urls.static import static
-import debug_toolbar
+# from django.conf import settings
+# from django.conf.urls.static import static
+# import debug_toolbar
+# from django.contrib import admin
+# from django.urls import path, include
+# admin.site.site_header = "Storefront Admin"
+# admin.site.index_title="Admin"
+
+# urlpatterns = [
+#     path('admin/', admin.site.urls),
+#     path('details/', include('details.urls')),
+#     path('auth/', include('djoser.urls')),
+#     path('auth/', include('djoser.urls.jwt')),
+#     path('__debug__/', include(debug_toolbar.urls)),
+# ]
+
+
 from django.contrib import admin
 from django.urls import path, include
-admin.site.site_header = "Storefront Admin"
-admin.site.index_title="Admin"
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('details/', include('details.urls')),
-    path('auth/', include('djoser.urls')),
-    path('auth/', include('djoser.urls.jwt')),
-    path('__debug__/', include(debug_toolbar.urls)),
+    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/register/', include('accounts.urls')), 
+    path('api/', include('details.urls')),
 ]
